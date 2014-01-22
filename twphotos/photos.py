@@ -18,33 +18,33 @@ class TwitterPhotos(object):
                                access_token_key=ACCESS_TOKEN,
                                access_token_secret=ACCESS_TOKEN_SECRET)
 
-    def get(self, count=None):
+    def get(self, count=None, since_id=None):
         """
         Get all photos from the user or members of the list
         :param count: Number of tweets to try and retrieve. If None, return
             all photos
-
+        :param since_id: Number of tweets to try and retrieve. If None, return
+            all photos
         """
 
-        return self.get_once(count=count)
+        return self.get_once(count=count, since_id=since_id)
 
-    def get_once(self, count=None, max_id=None):
+    def get_once(self, count=None, max_id=None, since_id=None):
         statuses = self.api.GetUserTimeline(screen_name=self.user,
                                             count=count or COUNT_PER_GET,
                                             max_id=max_id,
+                                            since_id=since_id,
                                             exclude_replies=True)
         if statuses:
-            # Minimum id of the current batch of statuses
             min_id = statuses[-1].id
         photos = [
-            #s.media[0]['media_url'] for s in statuses if s.media
             s.media[0]['id'] for s in statuses if s.media
         ]
 
-        # Recursive case
         if statuses and count is None:
-            return photos + self.get_once(count=None, max_id=min_id - 1)
-        # Base case
+            return photos + self.get_once(count=None,
+                                          max_id=min_id - 1,
+                                          since_id=since_id)
         else:
             return photos
 
@@ -58,6 +58,6 @@ class TwitterPhotos(object):
 def main():
     twphotos = TwitterPhotos()
     twphotos.verify_credentials()
-    p = twphotos.get()
+    p = twphotos.get(since_id=None)
     print p
     print len(p)
