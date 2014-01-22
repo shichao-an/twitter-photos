@@ -3,6 +3,7 @@ import requests
 
 
 def download(media_url, size, outdir):
+    print media_url, size, outdir
     r = requests.get(media_url + ':' + size, stream=True)
     bs = os.path.basename(media_url)
     if outdir is not None:

@@ -68,10 +68,11 @@ class TwitterPhotos(object):
         if size not in MEDIA_SIZES:
             raise Exception('Invalid media size %s' % size)
         for user in self.photos:
-            photos = self.photos[user]
-            media_url = photos[1]
             d = create_directory(os.path.join(self.outdir, user))
-            download(media_url, size, d)
+            for photo in self.photos[user]:
+                photos = self.photos[user]
+                media_url = photo[1]
+                download(media_url, size, d)
 
     @property
     def users(self):
