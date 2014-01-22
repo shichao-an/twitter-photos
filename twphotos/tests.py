@@ -1,4 +1,5 @@
 import os
+os.environ['TWPHOTOS_TEST_CONFIG'] = '0'
 import shutil
 from unittest import TestCase
 from .settings import PROJECT_PATH
@@ -27,7 +28,7 @@ class TestPhotos(TestCase):
     def test_download(self):
         twphotos = TwitterPhotos(user=TEST_USER, outdir=self.directory)
         p = twphotos.get(count=20)
-        p = twphotos.download()
+        twphotos.download()
         self.assertEqual(len(p), len(os.listdir(self.directory)))
 
     def tearDown(self):
