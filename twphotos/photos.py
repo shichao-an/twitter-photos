@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, absolute_import
 import os
-import twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
                        ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES)
 from .utils import download, create_directory
+import twitter
 
 
 class TwitterPhotos(object):
@@ -67,11 +67,13 @@ class TwitterPhotos(object):
         if size not in MEDIA_SIZES:
             raise Exception('Invalid media size %s' % size)
         for user in self.photos:
-            d = create_directory(os.path.join(self.outdir, user))
+            d = os.path.join(self.outdir or '', user)
+            # Create intermediate directory
+            create_directory(d)
             for photo in self.photos[user]:
-                photos = self.photos[user]
                 media_url = photo[1]
-                download(media_url, size, d)
+                f = download(media_url, size, d)
+                print (f)
 
     @property
     def users(self):
@@ -95,4 +97,5 @@ class TwitterPhotos(object):
 def main():
     twphotos = TwitterPhotos(list_slug='h')
     p = twphotos.get(count=20, since_id=None)
-    print (p)
+    twphotos.download()
+    #print (p)
