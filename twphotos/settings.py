@@ -7,7 +7,7 @@ USER_CONFIG = os.path.join(USER_DIR, '.twphotos')
 d = os.path.dirname(__file__)
 PROJECT_PATH = os.path.abspath(os.path.join(d, os.pardir))
 TEST_CONFIG = os.path.join(PROJECT_PATH, '.twphotos')
-sys.path.append(os.path.join(PROJECT_PATH, 'python-twitter'))
+sys.path.insert(1, os.path.join(PROJECT_PATH, 'python-twitter'))
 config = ConfigParser.ConfigParser()
 if os.environ.get('TWPHOTOS_TEST_CONFIG'):
     config.read(TEST_CONFIG)
