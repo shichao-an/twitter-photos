@@ -36,3 +36,4 @@ ACCESS_TOKEN = items.get('access_token_key')
 ACCESS_TOKEN_SECRET = items.get('access_token_secret')
 
 COUNT_PER_GET = 200
+MEDIA_SIZES = ['large', 'medium', 'small', 'thumb']
