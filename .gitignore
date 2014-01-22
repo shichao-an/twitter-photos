@@ -10,3 +10,10 @@ dist
 
 # Third-party packages
 python-twitter
+
+# Test scripts
+test.sh
+
+# Coverage
+.coverage
+
