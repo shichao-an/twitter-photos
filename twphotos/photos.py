@@ -1,6 +1,5 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals, absolute_import
 import os
 import twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
