@@ -9,6 +9,7 @@ from .utils import create_directory
 
 TEST_OUTPUT = 'test-output'
 TEST_USER = 'WIRED'
+TEST_LIST_SLUG = 'ces-2014'
 
 
 class TestPhotos(TestCase):
@@ -30,7 +31,14 @@ class TestPhotos(TestCase):
         twphotos = TwitterPhotos(user=TEST_USER, outdir=self.directory)
         p = twphotos.get(count=20)
         twphotos.download()
-        #self.assertEqual(len(p), len(os.listdir(self.directory)))
+        self.assertEqual(len(p), len(os.listdir(self.directory)))
 
+    def test_list_download(self):
+        twphotos = TwitterPhotos(user=TEST_USER, list_slug=TEST_LIST_SLUG,
+                                 outdir=self.directory)
+        p = twphotos.get(count=20)
+        twphotos.download()
+        self.assertEqual(len(p), len(os.listdir(self.directory)))
+        
     def tearDown(self):
         shutil.rmtree(self.directory)
