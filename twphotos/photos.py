@@ -32,13 +32,13 @@ class TwitterPhotos(object):
         self.auth_user = self.verify_credentials().screen_name
         self.photos = {}
         for user in self.users:
-            self.photos[user] = self.get_once(user=user,
-                                              count=count,
-                                              since_id=since_id)
+            self.photos[user] = self.load(user=user,
+                                          count=count,
+                                          since_id=since_id)
         return self.photos
 
-    def get_once(self, user=None, count=None, max_id=None,
-                 since_id=None, photos=[]):
+    def load(self, user=None, count=None, max_id=None,
+             since_id=None, photos=[]):
         statuses = self.api.GetUserTimeline(screen_name=user,
                                             count=count or COUNT_PER_GET,
                                             max_id=max_id,
@@ -54,10 +54,10 @@ class TwitterPhotos(object):
         ]
 
         if statuses and count is None:
-            return self.get_once(count=None,
-                                 max_id=min_id - 1,
-                                 since_id=since_id,
-                                 photos=photos + fetched_photos)
+            return self.load(count=None,
+                             max_id=min_id - 1,
+                             since_id=since_id,
+                             photos=photos + fetched_photos)
         else:
             return photos + fetched_photos
 
