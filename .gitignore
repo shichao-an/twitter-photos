@@ -7,3 +7,6 @@ dist
 
 # Test credential file
 .twphotos
+
+# Third-party packages
+python-twitter
