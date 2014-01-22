@@ -1,0 +1,9 @@
+*.py[cod]
+.DS_Store
+*.swp
+build
+dist
+*.egg-info
+
+# Test credential file
+.twphotos
