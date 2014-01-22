@@ -4,6 +4,7 @@ import shutil
 from unittest import TestCase
 from .settings import PROJECT_PATH
 from .photos import TwitterPhotos
+from .utils import create_directory
 
 
 TEST_OUTPUT = 'test-output'
@@ -14,12 +15,12 @@ class TestPhotos(TestCase):
     """Test TwitterPhotos class programmatically"""
     def setUp(self):
         d = os.path.join(PROJECT_PATH, TEST_OUTPUT)
-        if not os.path.exists(d):
-            os.makedirs(d)
+        create_directory(d)
         self.directory = d
 
     def test_credentials(self):
-        pass
+        twphotos = TwitterPhotos()
+        print twphotos.verify_credentials()
 
     def test_get(self):
         twphotos = TwitterPhotos(TEST_USER)
