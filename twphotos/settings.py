@@ -40,3 +40,4 @@ COUNT_PER_GET = 200
 MEDIA_SIZES = ['large', 'medium', 'small', 'thumb']
 PROGRESS_FORMATTER = \
     'Downloading %(media_url)s from %(user)s: %(index)d/%(total)d'
+NUM_THREADS = 8

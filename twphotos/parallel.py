@@ -3,9 +3,8 @@ import Queue
 import threading
 import sys
 import urllib3
-from .settings import PROGRESS_FORMATTER
+from .settings import PROGRESS_FORMATTER, NUM_THREADS
 
-NUM_THREADS = 8
 
 pool_manager = urllib3.PoolManager()
 photo_queue = Queue.Queue()
