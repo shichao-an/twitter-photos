@@ -36,6 +36,7 @@ class TwitterPhotos(object):
             all photos since `since_id`
         :param since_id: An integer specifying the oldest id
         """
+        print('Retrieving photos from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
         for user in self.users:
             self.photos[user] = self.load(user=user,
