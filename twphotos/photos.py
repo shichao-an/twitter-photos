@@ -101,6 +101,13 @@ class TwitterPhotos(object):
     def verify_credentials(self):
         return self.api.VerifyCredentials()
 
+    def print_urls(self):
+        for user in self.photos:
+            photos = self.photos[user]
+            for photo in photos:
+                line = '%s %s %s' % (user, photos[0], photo[1])
+                print(line)
+
     def _get_progress(self, user, media_url):
         m = 'Downloading %(media_url)s %(user)s: %(index)s/%(total)s'
         d = {
@@ -124,4 +131,7 @@ def main():
                              outdir=args.outdir)
     twphotos.verify_credentials()
     twphotos.get()
-    twphotos.download()
+    if args.print:
+        twphotos.print_urls()
+    else:
+        twphotos.download()
