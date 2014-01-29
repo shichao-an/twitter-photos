@@ -10,7 +10,8 @@ def parse_args():
                         help='list slug with --user as list owner')
     parser.add_argument('-o', '--outdir',
                         help='output directory')
+    print_help = 'print media urls and tweet ids instead of download'
     parser.add_argument('-p', '--print', action='store_true',
-                            help='print media urls and tweet ids instead of download')
+                        help=print_help)
     args = parser.parse_args()
     return args
