@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals, absolute_import
 import atexit
 import os
-import signal
 import sys
 # Import .settings before twitter due to local development of python-twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
@@ -97,7 +96,10 @@ class TwitterPhotos(object):
                                                owner_screen_name=owner)
             members = [member.screen_name for member in _members]
         else:
-            members = [self.auth_user]
+            if self.user:
+                members = [self.user]
+            else:
+                members = [self.auth_user]
         return members
 
     def verify_credentials(self):
@@ -132,6 +134,7 @@ def new_line():
 
 def main():
     args = parse_args()
+    print(args)
     twphotos = TwitterPhotos(user=args.user,
                              list_slug=args.list_slug,
                              outdir=args.outdir)
@@ -145,4 +148,3 @@ def main():
 
 # Register cleanup functions
 atexit.register(new_line)
-signal.signal(signal.SIGINT, new_line)
