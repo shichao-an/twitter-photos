@@ -80,17 +80,14 @@ class TwitterPhotos(object):
             for photo in self.photos[user]:
                 media_url = photo[1]
                 self._print_progress(user, media_url)
-                f = download(media_url, size, d)
+                download(media_url, size, d)
                 self._downloaded += 1
-                #print(f)
 
     @property
     def users(self):
         members = None
         if self.list_slug:
             owner = self.user or self.auth_user
-            print(owner)
-            print(self.list_slug)
             _members = self.api.GetListMembers(list_id=None,
                                                slug=self.list_slug,
                                                owner_screen_name=owner)
@@ -134,12 +131,12 @@ def new_line():
 
 def main():
     args = parse_args()
-    print(args)
     twphotos = TwitterPhotos(user=args.user,
                              list_slug=args.list_slug,
                              outdir=args.outdir)
     twphotos.verify_credentials()
     twphotos.get()
+    # Print only scree_name, tweet id and media_url
     if args.print:
         twphotos.print_urls()
     else:
