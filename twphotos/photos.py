@@ -5,7 +5,8 @@ import os
 import sys
 # Import .settings before twitter due to local development of python-twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
-                       ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES)
+                       ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES,
+                       PROGRESS_FORMATTER)
 from .utils import download, create_directory
 from .command import parse_args
 from .parallel import parallel_download
@@ -126,15 +127,14 @@ class TwitterPhotos(object):
                 self._downloaded += 1
 
     def _get_progress(self, user, media_url):
-        m = 'Downloading %(media_url)s from %(user)s: %(index)d/%(total)d'
         d = {
             'media_url': os.path.basename(media_url),
             'user': user,
             'index': self._downloaded + 1,
             'total': self._total,
         }
-        msg = m % d
-        return msg
+        progress = PROGRESS_FORMATTER % d
+        return progress
 
     def _print_progress(self, user, media_url):
         sys.stdout.write('\r%s' % self._get_progress(user, media_url))

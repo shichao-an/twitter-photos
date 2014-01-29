@@ -3,6 +3,7 @@ import Queue
 import threading
 import sys
 import urllib3
+from .settings import PROGRESS_FORMATTER
 
 NUM_THREADS = 8
 
@@ -42,14 +43,13 @@ def worker(queue, user, size, outdir, total):
         media_url = photo[1]
         urllib3_download(media_url, size, outdir)
         with lock:
-            m = 'Downloading %(media_url)s from %(user)s: %(index)d/%(total)d'
             d = {
                 'media_url': os.path.basename(media_url),
                 'user': user,
                 'index': total - photo_queue.qsize(),
                 'total': total,
             }
-            progress = m % d
+            progress = PROGRESS_FORMATTER % d
             sys.stdout.write('\r%s' % progress)
             sys.stdout.flush()
 
