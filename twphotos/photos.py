@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, absolute_import
+import atexit
 import os
+import signal
 import sys
 # Import .settings before twitter due to local development of python-twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
@@ -109,7 +111,7 @@ class TwitterPhotos(object):
                 print(line)
 
     def _get_progress(self, user, media_url):
-        m = 'Downloading %(media_url)s %(user)s: %(index)s/%(total)s'
+        m = 'Downloading %(media_url)s from %(user)s: %(index)s/%(total)s'
         d = {
             'media_url': os.path.basename(media_url),
             'user': user,
@@ -124,6 +126,10 @@ class TwitterPhotos(object):
         sys.stdout.flush()
 
 
+def new_line():
+    sys.stdout.write('\n')
+
+
 def main():
     args = parse_args()
     twphotos = TwitterPhotos(user=args.user,
@@ -135,3 +141,8 @@ def main():
         twphotos.print_urls()
     else:
         twphotos.download()
+
+
+# Register cleanup functions
+atexit.register(new_line)
+signal.signal(signal.SIGINT, new_line)
