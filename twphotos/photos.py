@@ -8,22 +8,27 @@ from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
                        ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES)
 from .utils import download, create_directory
 from .command import parse_args
+from .parallel import parallel_download
 import twitter
 
 
 class TwitterPhotos(object):
-    def __init__(self, user=None, list_slug=None, outdir=None, num=None):
+    def __init__(self, user=None, list_slug=None,
+                 outdir=None, num=None, parallel=False):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
         :param outdir: The output directory (absolute path)
         :param num: Number of most recent photos to download from each
             related user
+        :param parallel: A boolean indicating whether parallel download is
+            enabled
         """
         self.user = user
         self.list_slug = list_slug
         self.outdir = outdir
         self.num = num
+        self.parallel = parallel
         self.api = twitter.Api(consumer_key=CONSUMER_KEY,
                                consumer_secret=CONSUMER_SECRET,
                                access_token_key=ACCESS_TOKEN,
@@ -79,10 +84,10 @@ class TwitterPhotos(object):
         if size not in MEDIA_SIZES:
             raise Exception('Invalid media size %s' % size)
         for user in self.photos:
-            directory = os.path.join(self.outdir or '', user)
+            d = os.path.join(self.outdir or '', user)
             # Create intermediate directory
-            create_directory(directory)
-            self._download_photos(user, directory, size)
+            create_directory(d)
+            self._download_photos(self.photos[user], user, d, size)
 
     @property
     def users(self):
@@ -110,15 +115,18 @@ class TwitterPhotos(object):
                 line = '%s %s %s' % (user, photo[0], photo[1])
                 print(line)
 
-    def _download_photos(self, user, directory, size):
-        for photo in self.photos[user]:
-            media_url = photo[1]
-            self._print_progress(user, media_url)
-            download(media_url, size, directory)
-            self._downloaded += 1
+    def _download_photos(self, photos, user, outdir, size):
+        if self.parallel:
+            parallel_download(photos, user, size, outdir)
+        else:
+            for photo in photos:
+                media_url = photo[1]
+                self._print_progress(user, media_url)
+                download(media_url, size, outdir)
+                self._downloaded += 1
 
     def _get_progress(self, user, media_url):
-        m = 'Downloading %(media_url)s from %(user)s: %(index)s/%(total)s'
+        m = 'Downloading %(media_url)s from %(user)s: %(index)d/%(total)d'
         d = {
             'media_url': os.path.basename(media_url),
             'user': user,
@@ -142,7 +150,8 @@ def main():
     twphotos = TwitterPhotos(user=args.user,
                              list_slug=args.list_slug,
                              outdir=args.outdir,
-                             num=args.num)
+                             num=args.num,
+                             parallel=args.parallel)
     twphotos.verify_credentials()
     twphotos.get()
     # Print only scree_name, tweet id and media_url
