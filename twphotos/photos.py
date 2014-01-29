@@ -12,15 +12,18 @@ import twitter
 
 
 class TwitterPhotos(object):
-    def __init__(self, user=None, list_slug=None, outdir=None):
+    def __init__(self, user=None, list_slug=None, outdir=None, num=None):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
         :param outdir: The output directory (absolute path)
+        :param num: Number of most recent photos to download from each
+            related user
         """
         self.user = user
         self.list_slug = list_slug
         self.outdir = outdir
+        self.num = num
         self.api = twitter.Api(consumer_key=CONSUMER_KEY,
                                consumer_secret=CONSUMER_SECRET,
                                access_token_key=ACCESS_TOKEN,
@@ -39,9 +42,10 @@ class TwitterPhotos(object):
         print('Retrieving photos from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
         for user in self.users:
-            self.photos[user] = self.load(user=user,
-                                          count=count,
-                                          since_id=since_id)
+            photos = self.load(user=user,
+                               count=count,
+                               since_id=since_id)
+            self.photos[user] = photos[:self.num]
             self._total += len(self.photos[user])
         return self.photos
 
@@ -134,7 +138,8 @@ def main():
     args = parse_args()
     twphotos = TwitterPhotos(user=args.user,
                              list_slug=args.list_slug,
-                             outdir=args.outdir)
+                             outdir=args.outdir,
+                             num=args.num)
     twphotos.verify_credentials()
     twphotos.get()
     # Print only scree_name, tweet id and media_url

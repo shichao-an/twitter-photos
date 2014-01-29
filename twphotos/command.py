@@ -13,5 +13,10 @@ def parse_args():
     print_help = 'print media urls and tweet ids instead of download'
     parser.add_argument('-p', '--print', action='store_true',
                         help=print_help)
+    parser.add_argument('-r', '--parallel', action='store_true',
+                        help='enable parallel download')
+    count_help = 'number of most recent photos to download'
+    parser.add_argument('-n', '--num', type=int,
+                        help=count_help)
     args = parser.parse_args()
     return args
