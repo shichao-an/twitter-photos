@@ -111,7 +111,7 @@ class TwitterPhotos(object):
         for user in self.photos:
             photos = self.photos[user]
             for photo in photos:
-                line = '%s %s %s' % (user, photos[0], photo[1])
+                line = '%s %s %s' % (user, photo[0], photo[1])
                 print(line)
 
     def _get_progress(self, user, media_url):
