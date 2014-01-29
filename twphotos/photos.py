@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, absolute_import
 import os
+import sys
 # Import .settings before twitter due to local development of python-twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
                        ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES)
 from .utils import download, create_directory
+from .command import parse_args
 import twitter
 
 
@@ -22,6 +24,9 @@ class TwitterPhotos(object):
                                consumer_secret=CONSUMER_SECRET,
                                access_token_key=ACCESS_TOKEN,
                                access_token_secret=ACCESS_TOKEN_SECRET)
+        self.photos = {}
+        self._downloaded = 0
+        self._total = 0
 
     def get(self, count=None, since_id=None):
         """
@@ -31,11 +36,11 @@ class TwitterPhotos(object):
         :param since_id: An integer specifying the oldest id
         """
         self.auth_user = self.verify_credentials().screen_name
-        self.photos = {}
         for user in self.users:
             self.photos[user] = self.load(user=user,
                                           count=count,
                                           since_id=since_id)
+            self._total += len(self.photos[user])
         return self.photos
 
     def load(self, user=None, count=None, max_id=None,
@@ -73,16 +78,18 @@ class TwitterPhotos(object):
             create_directory(d)
             for photo in self.photos[user]:
                 media_url = photo[1]
+                self._print_progress(user, media_url)
                 f = download(media_url, size, d)
-                print (f)
+                self._downloaded += 1
+                #print(f)
 
     @property
     def users(self):
         members = None
         if self.list_slug:
             owner = self.user or self.auth_user
-            print (owner)
-            print (self.list_slug)
+            print(owner)
+            print(self.list_slug)
             _members = self.api.GetListMembers(list_id=None,
                                                slug=self.list_slug,
                                                owner_screen_name=owner)
@@ -94,9 +101,27 @@ class TwitterPhotos(object):
     def verify_credentials(self):
         return self.api.VerifyCredentials()
 
+    def _get_progress(self, user, media_url):
+        m = 'Downloading %(media_url)s %(user)s: %(index)s/%(total)s'
+        d = {
+            'media_url': os.path.basename(media_url),
+            'user': user,
+            'index': self._downloaded + 1,
+            'total': self._total,
+        }
+        msg = m % d
+        return msg
+
+    def _print_progress(self, user, media_url):
+        sys.stdout.write('\r%s' % self._get_progress(user, media_url))
+        sys.stdout.flush()
+
 
 def main():
-    twphotos = TwitterPhotos(list_slug='h')
-    p = twphotos.get(count=20, since_id=None)
+    args = parse_args()
+    twphotos = TwitterPhotos(user=args.user,
+                             list_slug=args.list_slug,
+                             outdir=args.outdir)
+    twphotos.verify_credentials()
+    twphotos.get()
     twphotos.download()
-    #print (p)
