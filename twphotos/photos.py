@@ -79,14 +79,10 @@ class TwitterPhotos(object):
         if size not in MEDIA_SIZES:
             raise Exception('Invalid media size %s' % size)
         for user in self.photos:
-            d = os.path.join(self.outdir or '', user)
+            directory = os.path.join(self.outdir or '', user)
             # Create intermediate directory
-            create_directory(d)
-            for photo in self.photos[user]:
-                media_url = photo[1]
-                self._print_progress(user, media_url)
-                download(media_url, size, d)
-                self._downloaded += 1
+            create_directory(directory)
+            self._download_photos(user, directory, size)
 
     @property
     def users(self):
@@ -113,6 +109,13 @@ class TwitterPhotos(object):
             for photo in photos:
                 line = '%s %s %s' % (user, photo[0], photo[1])
                 print(line)
+
+    def _download_photos(self, user, directory, size):
+        for photo in self.photos[user]:
+            media_url = photo[1]
+            self._print_progress(user, media_url)
+            download(media_url, size, directory)
+            self._downloaded += 1
 
     def _get_progress(self, user, media_url):
         m = 'Downloading %(media_url)s from %(user)s: %(index)s/%(total)s'
