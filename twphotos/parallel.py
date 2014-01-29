@@ -12,7 +12,6 @@ lock = threading.Lock()
 
 
 def parallel_download(photos, user, size, outdir):
-    print('Parallel downloading photos from %s: %d' % (user, len(photos)))
     threads = []
     # Put photos into `photo_queue`
     for photo in photos:
