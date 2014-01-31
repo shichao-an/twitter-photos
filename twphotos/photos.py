@@ -44,14 +44,15 @@ class TwitterPhotos(object):
         self._downloaded = 0
         self._total = 0
 
-    def get(self, count=None, since_id=None):
+    def get(self, count=None, since_id=None, silent=False):
         """
         Get all photos from the user or members of the list
         :param count: Number of tweets to try and retrieve. If None, return
             all photos since `since_id`
         :param since_id: An integer specifying the oldest tweet id
         """
-        print('Retrieving photos from Twitter API...')
+        if not silent:
+            print('Retrieving photos from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
         self.since_ids = read_since_ids(self.users)
         for user in self.users:
@@ -133,9 +134,12 @@ class TwitterPhotos(object):
     def print_urls(self):
         for user in self.photos:
             photos = self.photos[user]
-            for photo in photos:
+            for i, photo in enumerate(photos):
                 line = '%s %s %s' % (user, photo[0], photo[1])
-                print(line)
+                if i < len(photos) - 1:
+                    print(line)
+                else:
+                    sys.stdout.write(line)
 
     def _download_photos(self, photos, user, outdir, size):
         if self.increment:
@@ -185,11 +189,12 @@ def main():
                              num=args.num,
                              parallel=args.parallel,
                              increment=args.increment)
-    twphotos.get()
     # Print only scree_name, tweet id and media_url
     if args.print:
+        twphotos.get(silent=True)
         twphotos.print_urls()
     else:
+        twphotos.get()
         twphotos.download()
 
 
