@@ -10,6 +10,7 @@ from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
 from .utils import download, create_directory
 from .command import parse_args
 from .parallel import parallel_download
+from .increment import read_since_ids, set_max_ids
 import twitter
 
 
@@ -38,6 +39,8 @@ class TwitterPhotos(object):
                                access_token_key=ACCESS_TOKEN,
                                access_token_secret=ACCESS_TOKEN_SECRET)
         self.photos = {}
+        self.max_ids = {}
+        self.since_ids = {}
         self._downloaded = 0
         self._total = 0
 
@@ -50,12 +53,17 @@ class TwitterPhotos(object):
         """
         print('Retrieving photos from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
+        self.since_ids = read_since_ids(self.users)
         for user in self.users:
+            if self.increment:
+                since_id = self.since_ids.get(user)
             photos = self.load(user=user,
                                count=count,
                                since_id=since_id)
             self.photos[user] = photos[:self.num]
             self._total += len(self.photos[user])
+            if photos:
+                self.max_ids[user] = photos[0][0]
         return self.photos
 
     def load(self, user=None, count=None, max_id=None,
@@ -92,6 +100,7 @@ class TwitterPhotos(object):
             # Create intermediate directory
             create_directory(d)
             self._download_photos(self.photos[user], user, d, size)
+        set_max_ids(self.max_ids)
 
     @property
     def users(self):

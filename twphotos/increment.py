@@ -1,4 +1,4 @@
-from .settings import config, SECTIONS
+from .settings import config, SECTIONS, CONFIG
 
 
 if not config.has_section(SECTIONS['INCREMENTS']):
@@ -13,11 +13,11 @@ def read_since_ids(users):
 
     Return a dictionary mapping users to ids
     """
-    d = {
-        user: config.getint(SECTIONS['INCREMENTS'], user)
-        for user in users
-    }
-    return d
+    since_ids = {}
+    for user in users:
+        if config.has_option(SECTIONS['INCREMENTS'], user):
+            since_ids[user] = config.getint(SECTIONS['INCREMENTS'], user)
+    return since_ids
 
 
 def set_max_ids(max_ids):
@@ -28,3 +28,5 @@ def set_max_ids(max_ids):
     """
     for user, max_id in max_ids.items():
         config.set(SECTIONS['INCREMENTS'], user, max_id)
+    with open(CONFIG, 'w') as f:
+        config.write(f)

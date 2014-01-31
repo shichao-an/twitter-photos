@@ -10,7 +10,7 @@ PROJECT_PATH = os.path.abspath(os.path.join(d, os.pardir))
 TEST_CONFIG = os.path.join(PROJECT_PATH, '.twphotos')
 SECTIONS = {
     'CREDENTIALS': 'credentials',
-    'INCREMENTS': 'increment',
+    'INCREMENTS': 'increments',
 }
 
 # For local development
@@ -19,9 +19,11 @@ sys.path.insert(1, os.path.join(PROJECT_PATH, 'python-twitter'))
 config = ConfigParser.ConfigParser()
 
 if os.environ.get('TWPHOTOS_TEST_CONFIG'):
-    config.read(TEST_CONFIG)
+    CONFIG = TEST_CONFIG
 else:
-    config.read(USER_CONFIG)
+    CONFIG = USER_CONFIG
+
+config.read(CONFIG)
 
 items = {}
 item_names = [
