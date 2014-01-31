@@ -14,8 +14,8 @@ import twitter
 
 
 class TwitterPhotos(object):
-    def __init__(self, user=None, list_slug=None,
-                 outdir=None, num=None, parallel=False):
+    def __init__(self, user=None, list_slug=None, outdir=None,
+                 num=None, parallel=False, increment=False):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
@@ -24,12 +24,15 @@ class TwitterPhotos(object):
             related user
         :param parallel: A boolean indicating whether parallel download is
             enabled
+        :param increment: A boolean indicating whether to download only new
+            photos since last download
         """
         self.user = user
         self.list_slug = list_slug
         self.outdir = outdir
         self.num = num
         self.parallel = parallel
+        self.increment = increment
         self.api = twitter.Api(consumer_key=CONSUMER_KEY,
                                consumer_secret=CONSUMER_SECRET,
                                access_token_key=ACCESS_TOKEN,

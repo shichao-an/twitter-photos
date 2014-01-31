@@ -2,17 +2,21 @@ import ConfigParser
 import os
 import sys
 
+
 USER_DIR = os.path.join(os.path.expanduser('~'))
 USER_CONFIG = os.path.join(USER_DIR, '.twphotos')
 d = os.path.dirname(__file__)
 PROJECT_PATH = os.path.abspath(os.path.join(d, os.pardir))
 TEST_CONFIG = os.path.join(PROJECT_PATH, '.twphotos')
+# For local development
 sys.path.insert(1, os.path.join(PROJECT_PATH, 'python-twitter'))
+
 config = ConfigParser.ConfigParser()
 if os.environ.get('TWPHOTOS_TEST_CONFIG'):
     config.read(TEST_CONFIG)
 else:
     config.read(USER_CONFIG)
+
 items = {}
 item_names = [
     'consumer_key',
@@ -21,11 +25,11 @@ item_names = [
     'access_token_secret',
 ]
 
-if config.has_section('twphotos'):
-    items = dict(config.items('twphotos'))
+if config.has_section('credentials'):
+    items = dict(config.items('credentials'))
     for name in items:
         if name not in item_names:
-            raise Exception('Unknown name "%s" in credential file.' % name)
+            raise Exception('Unknown name "%s" in credentials section' % name)
 
 if len(items) < 4:
     raise Exception('No credentials found.')

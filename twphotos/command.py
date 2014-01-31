@@ -18,5 +18,7 @@ def parse_args():
     count_help = 'number of most recent photos to download'
     parser.add_argument('-n', '--num', type=int,
                         help=count_help)
+    parser.add_argument('-i', '--increment', action='store_true',
+                        help='download only new photos since last download')
     args = parser.parse_args()
     return args
