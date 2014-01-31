@@ -54,7 +54,6 @@ class TwitterPhotos(object):
         print('Retrieving photos from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
         self.since_ids = read_since_ids(self.users)
-        print(self.users)
         for user in self.users:
             if self.increment:
                 since_id = self.since_ids.get(user)
@@ -133,6 +132,17 @@ class TwitterPhotos(object):
                 print(line)
 
     def _download_photos(self, photos, user, outdir, size):
+        if self.increment:
+            if not photos and user in self.since_ids:
+                msg = 'No new photos from %s since last downloads.' % user
+                sys.stdout.write(msg)
+                return
+        else:
+            if not photos:
+                msg = 'No photos from %s.' % user
+                sys.stdout.write(msg)
+                return
+
         if self.parallel:
             parallel_download(photos, user, size, outdir)
         else:
