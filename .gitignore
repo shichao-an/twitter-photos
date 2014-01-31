@@ -4,6 +4,7 @@
 build
 dist
 *.egg-info
+run.py
 
 # Test credential file
 .twphotos
