@@ -5,8 +5,8 @@ import sys
 
 USER_DIR = os.path.join(os.path.expanduser('~'))
 USER_CONFIG = os.path.join(USER_DIR, '.twphotos')
-d = os.path.dirname(__file__)
-PROJECT_PATH = os.path.abspath(os.path.join(d, os.pardir))
+_d = os.path.dirname(__file__)
+PROJECT_PATH = os.path.abspath(os.path.join(_d, os.pardir))
 TEST_CONFIG = os.path.join(PROJECT_PATH, '.twphotos')
 SECTIONS = {
     'CREDENTIALS': 'credentials',
@@ -25,28 +25,28 @@ else:
 
 config.read(CONFIG)
 
-items = {}
-item_names = [
+_items = {}
+CREDENTIAL_NAMES = (
     'consumer_key',
     'consumer_secret',
     'access_token_key',
     'access_token_secret',
-]
+)
 
 if config.has_section(SECTIONS['CREDENTIALS']):
-    items = dict(config.items(SECTIONS['CREDENTIALS']))
-    for name in items:
-        if name not in item_names:
+    _items = dict(config.items(SECTIONS['CREDENTIALS']))
+    for name in _items:
+        if name not in CREDENTIAL_NAMES:
             raise Exception('Unknown name "%s" in credentials section' % name)
 
-if len(items) < 4:
+if len(_items) < 4:
     raise Exception('No credentials found.')
 
 # Credentials
-CONSUMER_KEY = items.get('consumer_key')
-CONSUMER_SECRET = items.get('consumer_secret')
-ACCESS_TOKEN = items.get('access_token_key')
-ACCESS_TOKEN_SECRET = items.get('access_token_secret')
+CONSUMER_KEY = _items.get(CREDENTIAL_NAMES[0])
+CONSUMER_SECRET = _items.get(CREDENTIAL_NAMES[1])
+ACCESS_TOKEN = _items.get(CREDENTIAL_NAMES[2])
+ACCESS_TOKEN_SECRET = _items.get(CREDENTIAL_NAMES[3])
 
 # Other settings
 COUNT_PER_GET = 200
