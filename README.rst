@@ -42,7 +42,7 @@ Download all photos from an existing user other yourself with ``-u`` option foll
 
     $ twphotos -u wired
 
-Download `n` most recent photos from a user using ``-n`` followed by number::
+Download *n* most recent photos from a user using ``-n`` followed by number::
 
     $ twphotos -u wired -n 20
 
@@ -50,7 +50,7 @@ Download photos to a directory other than the current one::
 
     $ twphotos -u wired -o /path/to/dir
 
-Enable "incremental download" to download the new photos since the last downloads with ``-i``::
+Enable "incremental download" to download new photos since the last downloads with ``-i``::
 
     $ twphotos -u wired -i
 
@@ -62,7 +62,7 @@ Print username, tweet ids, and URLs instead of downloading them with ``-p`` swit
 
     $ twphotos -u wired -p
 
-You can retrieve only the URLs with ``cut`` command::
+You can retrieve URLs only with ``cut`` command::
 
     $ twphotos -u wired -p | cut -d ' ' -f3
 
