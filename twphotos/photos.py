@@ -49,7 +49,7 @@ class TwitterPhotos(object):
         Get all photos from the user or members of the list
         :param count: Number of tweets to try and retrieve. If None, return
             all photos since `since_id`
-        :param since_id: An integer specifying the oldest id
+        :param since_id: An integer specifying the oldest tweet id
         """
         print('Retrieving photos from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
@@ -62,8 +62,9 @@ class TwitterPhotos(object):
                                since_id=since_id)
             self.photos[user] = photos[:self.num]
             self._total += len(self.photos[user])
-            if photos:
-                self.max_ids[user] = photos[0][0]
+            if not photos and user in self.max_ids:
+                del self.max_ids[user]
+            print(self.max_ids)
         return self.photos
 
     def load(self, user=None, count=None, max_id=None,
@@ -75,6 +76,8 @@ class TwitterPhotos(object):
                                             exclude_replies=True)
         if statuses:
             min_id = statuses[-1].id
+            max_id = statuses[0].id
+            self.max_ids.setdefault(user, max_id)
 
         fetched_photos = [
             (s.media[0]['id'],
@@ -84,6 +87,7 @@ class TwitterPhotos(object):
 
         if statuses and count is None:
             return self.load(count=None,
+                             user=user,
                              max_id=min_id - 1,
                              since_id=since_id,
                              photos=photos + fetched_photos)
@@ -163,7 +167,8 @@ def main():
                              list_slug=args.list_slug,
                              outdir=args.outdir,
                              num=args.num,
-                             parallel=args.parallel)
+                             parallel=args.parallel,
+                             increment=args.increment)
     twphotos.verify_credentials()
     twphotos.get()
     # Print only scree_name, tweet id and media_url

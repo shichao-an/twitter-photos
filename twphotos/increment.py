@@ -16,7 +16,7 @@ def read_since_ids(users):
     since_ids = {}
     for user in users:
         if config.has_option(SECTIONS['INCREMENTS'], user):
-            since_ids[user] = config.getint(SECTIONS['INCREMENTS'], user)
+            since_ids[user] = config.getint(SECTIONS['INCREMENTS'], user) + 1
     return since_ids
 
 
