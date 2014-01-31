@@ -54,6 +54,7 @@ class TwitterPhotos(object):
         print('Retrieving photos from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
         self.since_ids = read_since_ids(self.users)
+        print(self.users)
         for user in self.users:
             if self.increment:
                 since_id = self.since_ids.get(user)
@@ -64,7 +65,6 @@ class TwitterPhotos(object):
             self._total += len(self.photos[user])
             if not photos and user in self.max_ids:
                 del self.max_ids[user]
-            print(self.max_ids)
         return self.photos
 
     def load(self, user=None, count=None, max_id=None,

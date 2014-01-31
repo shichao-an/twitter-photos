@@ -9,6 +9,7 @@ from .settings import PROGRESS_FORMATTER, NUM_THREADS
 pool_manager = urllib3.PoolManager()
 photo_queue = Queue.Queue()
 lock = threading.Lock()
+downloaded = 0
 
 
 def parallel_download(photos, user, size, outdir):
@@ -41,10 +42,12 @@ def worker(queue, user, size, outdir, total):
         media_url = photo[1]
         urllib3_download(media_url, size, outdir)
         with lock:
+            global downloaded
+            downloaded += 1
             d = {
                 'media_url': os.path.basename(media_url),
                 'user': user,
-                'index': total - photo_queue.qsize(),
+                'index': downloaded + 1 if downloaded < total else total,
                 'total': total,
             }
             progress = PROGRESS_FORMATTER % d
