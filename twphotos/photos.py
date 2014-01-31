@@ -59,7 +59,8 @@ class TwitterPhotos(object):
                 since_id = self.since_ids.get(user)
             photos = self.load(user=user,
                                count=count,
-                               since_id=since_id)
+                               since_id=since_id,
+                               num=self.num)
             self.photos[user] = photos[:self.num]
             self._total += len(self.photos[user])
             if not photos and user in self.max_ids:
@@ -67,7 +68,7 @@ class TwitterPhotos(object):
         return self.photos
 
     def load(self, user=None, count=None, max_id=None,
-             since_id=None, photos=[]):
+             since_id=None, num=None, photos=[]):
         statuses = self.api.GetUserTimeline(screen_name=user,
                                             count=count or COUNT_PER_GET,
                                             max_id=max_id,
@@ -84,11 +85,16 @@ class TwitterPhotos(object):
             if s.media and s.media[0]['type'] == 'photo'
         ]
 
+        if num is not None:
+            if len(photos + fetched_photos) >= num:
+                return photos + fetched_photos
+
         if statuses and count is None:
             return self.load(count=None,
                              user=user,
                              max_id=min_id - 1,
                              since_id=since_id,
+                             num=num,
                              photos=photos + fetched_photos)
         else:
             return photos + fetched_photos
@@ -179,7 +185,6 @@ def main():
                              num=args.num,
                              parallel=args.parallel,
                              increment=args.increment)
-    twphotos.verify_credentials()
     twphotos.get()
     # Print only scree_name, tweet id and media_url
     if args.print:
