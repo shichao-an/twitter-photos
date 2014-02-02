@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, absolute_import
 import atexit
+import collections
 import json
 import os
 import sys
@@ -189,6 +190,7 @@ class TestAPI(object):
     Twitter API
     """
     STATUSES = 'statuses.json'
+    Status = collections.namedtuple('Status', ['id', 'media'])
 
     def _loads(self):
         self._statuses = json.loads(self.STATUSES)
@@ -216,6 +218,11 @@ class TestAPI(object):
                 if status[0] <= since_id:
                     _end = i - 1
                     break
+        statuses = [
+            self.Status(id=s[0], media=s[1])
+            for s in self._statuses[_start, _end]
+        ]
+        return statuses
 
 
 def test_data(filename):
