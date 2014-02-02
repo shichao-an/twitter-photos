@@ -193,7 +193,8 @@ class TestAPI(object):
     Status = collections.namedtuple('Status', ['id', 'media'])
 
     def _loads(self):
-        self._statuses = json.loads(self.STATUSES)
+        with open(test_data(self.STATUSES)) as f:
+            self._statuses = json.loads(f.read())
 
     def GetUserTimeline(self, **kwargs):
         count = kwargs['count']
