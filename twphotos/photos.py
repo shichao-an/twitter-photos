@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals, absolute_import
 import atexit
+import json
 import os
 import sys
 # Import .settings before twitter due to local development of python-twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
                        ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES,
-                       PROGRESS_FORMATTER)
+                       PROGRESS_FORMATTER, TEST_DATA)
 from .utils import download, create_directory
 from .command import parse_args
 from .parallel import parallel_download
@@ -16,7 +17,7 @@ import twitter
 
 class TwitterPhotos(object):
     def __init__(self, user=None, list_slug=None, outdir=None,
-                 num=None, parallel=False, increment=False):
+                 num=None, parallel=False, increment=False, test=False):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
@@ -27,6 +28,7 @@ class TwitterPhotos(object):
             enabled
         :param increment: A boolean indicating whether to download only new
             photos since last download
+        :param test: A boolean indicating whether in test mode
         """
         self.user = user
         self.list_slug = list_slug
@@ -34,10 +36,14 @@ class TwitterPhotos(object):
         self.num = num
         self.parallel = parallel
         self.increment = increment
-        self.api = twitter.Api(consumer_key=CONSUMER_KEY,
-                               consumer_secret=CONSUMER_SECRET,
-                               access_token_key=ACCESS_TOKEN,
-                               access_token_secret=ACCESS_TOKEN_SECRET)
+        self.test = test
+        if not self.test:
+            self.api = twitter.Api(consumer_key=CONSUMER_KEY,
+                                   consumer_secret=CONSUMER_SECRET,
+                                   access_token_key=ACCESS_TOKEN,
+                                   access_token_secret=ACCESS_TOKEN_SECRET)
+        else:
+            self.api = TestAPI()
         self.photos = {}
         self.max_ids = {}
         self.since_ids = {}
@@ -175,6 +181,45 @@ class TwitterPhotos(object):
     def _print_progress(self, user, media_url):
         sys.stdout.write('\r%s' % self._get_progress(user, media_url))
         sys.stdout.flush()
+
+
+class TestAPI(object):
+    """
+    Test API interface that use mock data instead of hitting the
+    Twitter API
+    """
+    STATUSES = 'statuses.json'
+
+    def _loads(self):
+        self._statuses = json.loads(self.STATUSES)
+
+    def GetUserTimeline(self, **kwargs):
+        count = kwargs['count']
+        since_id = kwargs['since_id']
+        max_id = kwargs['max_id']
+        _start = 0
+        _end = -1
+        if max_id is not None:
+            if self._statuses[-1] > max_id:
+                return []
+            for i, status in enumerate(self._statuses):
+                if status[0] <= max_id:
+                    _start = i
+                    break
+        if since_id is not None:
+            if self._statuses[0] <= since_id:
+                return []
+            if max_id is not None:
+                if since_id > max_id:
+                    return []
+            for i, status in enumerate(self._statuses):
+                if status[0] <= since_id:
+                    _end = i - 1
+                    break
+
+
+def test_data(filename):
+    return os.path.join(TEST_DATA, filename)
 
 
 def new_line():
