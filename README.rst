@@ -62,6 +62,10 @@ Print username, tweet ids, and URLs instead of downloading them with ``-p`` swit
 
     $ twphotos -u wired -p
 
+Exclude replies tweets using ``-e`` switch::
+
+    $ twphotos -u wired -e
+
 You can retrieve URLs only with ``cut`` command::
 
     $ twphotos -u wired -p | cut -d ' ' -f3
@@ -79,3 +83,5 @@ The "soundmeter" command accepts the following options:
   -r, --parallel        enable parallel download
   -n NUM, --num NUM     number of most recent photos to download
   -i, --increment       download only new photos since last download
+  -e, --exclude_replies
+                        exclude replies
