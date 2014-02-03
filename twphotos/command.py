@@ -20,5 +20,7 @@ def parse_args():
                         help=count_help)
     parser.add_argument('-i', '--increment', action='store_true',
                         help='download only new photos since last download')
+    parser.add_argument('-e', '--exclude_replies', action='store_true',
+                        help='exclude replies')
     args = parser.parse_args()
     return args

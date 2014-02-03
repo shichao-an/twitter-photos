@@ -18,7 +18,8 @@ import twitter
 
 class TwitterPhotos(object):
     def __init__(self, user=None, list_slug=None, outdir=None,
-                 num=None, parallel=False, increment=False, test=False):
+                 num=None, parallel=False, increment=False,
+                 exclude_replies=False, test=False):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
@@ -37,6 +38,7 @@ class TwitterPhotos(object):
         self.num = num
         self.parallel = parallel
         self.increment = increment
+        self.exclude_replies = exclude_replies
         self.test = test
         if not self.test:
             self.api = twitter.Api(consumer_key=CONSUMER_KEY,
@@ -77,11 +79,12 @@ class TwitterPhotos(object):
 
     def load(self, user=None, count=None, max_id=None,
              since_id=None, num=None, photos=[]):
-        statuses = self.api.GetUserTimeline(screen_name=user,
-                                            count=count or COUNT_PER_GET,
-                                            max_id=max_id,
-                                            since_id=since_id,
-                                            exclude_replies=True)
+        statuses = self.api.GetUserTimeline(
+            screen_name=user,
+            count=count or COUNT_PER_GET,
+            max_id=max_id,
+            since_id=since_id,
+            exclude_replies=self.exclude_replies)
         if statuses:
             min_id = statuses[-1].id
             max_id = statuses[0].id
@@ -241,7 +244,8 @@ def main():
                              outdir=args.outdir,
                              num=args.num,
                              parallel=args.parallel,
-                             increment=args.increment)
+                             increment=args.increment,
+                             exclude_replies=args.exclude_replies)
     # Print only scree_name, tweet id and media_url
     if args.print:
         twphotos.get(silent=True)
