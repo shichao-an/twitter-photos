@@ -38,7 +38,7 @@ The simplest usage is to run "twphotos" from command-line without any options. T
 
     $ twphotos
 
-Download all photos from an existing user other yourself with ``-u`` option followed by username::
+Download all photos from an existing user other than yourself with ``-u`` option followed by username. "twphotos" will automatically create a directory with the specified username and put downloaded photos in there::
 
     $ twphotos -u wired
 
