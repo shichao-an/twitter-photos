@@ -248,6 +248,7 @@ def main():
                              num=args.num,
                              parallel=args.parallel,
                              increment=args.increment,
+                             size=args.size,
                              exclude_replies=args.exclude_replies)
     # Print only scree_name, tweet id and media_url
     if args.print:
