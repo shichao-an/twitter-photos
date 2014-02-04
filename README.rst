@@ -91,3 +91,4 @@ The "soundmeter" command accepts the following options:
   -i, --increment       download only new photos since last download
   -e, --exclude_replies
                         exclude replies
+  -s SIZE, --size SIZE  photo size (``large``, ``medium``, ``small`` and ``thumb``)
