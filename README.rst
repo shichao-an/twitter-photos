@@ -23,7 +23,7 @@ Or, you can download a source distribution and install with these commands::
 How It Works
 ------------
 
-The command-line front-end of Twitter Photos, twphotos, download photos from specified Twitter accounts into individual directories each named after username.
+The command-line front-end of Twitter Photos, twphotos, downloads photos from specified Twitter accounts into individual directories each named after username.
 
 
 Setup

@@ -1,4 +1,5 @@
 import argparse
+from .settings import MEDIA_SIZES
 
 
 def parse_args():
@@ -22,5 +23,7 @@ def parse_args():
                         help='download only new photos since last download')
     parser.add_argument('-e', '--exclude_replies', action='store_true',
                         help='exclude replies')
+    parser.add_argument('-s', '--size', choices=MEDIA_SIZES,
+                        help='photo size')
     args = parser.parse_args()
     return args

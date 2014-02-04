@@ -18,7 +18,7 @@ import twitter
 
 class TwitterPhotos(object):
     def __init__(self, user=None, list_slug=None, outdir=None,
-                 num=None, parallel=False, increment=False,
+                 num=None, parallel=False, increment=False, size=None,
                  exclude_replies=False, test=False):
         """
         :param user: The screen_name of the user whom to return results for
@@ -30,6 +30,8 @@ class TwitterPhotos(object):
             enabled
         :param increment: A boolean indicating whether to download only new
             photos since last download
+        :param: Photo size represented as a string (one of `MEDIA_SIZES`)
+        :param: A boolean indicating whether to exlude replies tweets
         :param test: A boolean indicating whether in test mode
         """
         self.user = user
@@ -38,6 +40,7 @@ class TwitterPhotos(object):
         self.num = num
         self.parallel = parallel
         self.increment = increment
+        self.size = size
         self.exclude_replies = exclude_replies
         self.test = test
         if not self.test:
@@ -112,7 +115,7 @@ class TwitterPhotos(object):
 
     def download(self, size=None):
         if size is None:
-            size = 'large'
+            size = self.size or 'large'
         if size not in MEDIA_SIZES:
             raise Exception('Invalid media size %s' % size)
         for user in self.photos:
