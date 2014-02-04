@@ -81,7 +81,9 @@ class TwitterPhotos(object):
         return self.photos
 
     def load(self, user=None, count=None, max_id=None,
-             since_id=None, num=None, photos=[]):
+             since_id=None, num=None, photos=None):
+        if photos is None:
+            photos = []
         statuses = self.api.GetUserTimeline(
             screen_name=user,
             count=count or COUNT_PER_GET,
