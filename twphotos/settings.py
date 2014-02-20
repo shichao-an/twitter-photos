@@ -8,7 +8,7 @@ USER_CONFIG = os.path.join(USER_DIR, '.twphotos')
 _d = os.path.dirname(__file__)
 PROJECT_PATH = os.path.abspath(os.path.join(_d, os.pardir))
 TEST_CONFIG = os.path.join(PROJECT_PATH, '.twphotos')
-TEST_DATA = os.path.join(PROJECT_PATH, 'testdata.json')
+TEST_DATA = os.path.join(PROJECT_PATH, 'testdata')
 SECTIONS = {
     'CREDENTIALS': 'credentials',
     'INCREMENTS': 'increments',

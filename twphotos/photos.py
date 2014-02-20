@@ -199,26 +199,34 @@ class TestAPI(object):
     """
     STATUSES = 'statuses.json'
     Status = collections.namedtuple('Status', ['id', 'media'])
+    Credentials = collections.namedtuple('Credentials', ['screen_name'])
+
+    def __init__(self, *args, **kwargs):
+        self._loads()
 
     def _loads(self):
         with open(test_data(self.STATUSES)) as f:
             self._statuses = json.loads(f.read())
 
     def GetUserTimeline(self, **kwargs):
-        count = kwargs['count']
-        since_id = kwargs['since_id']
-        max_id = kwargs['max_id']
-        _start = 0
-        _end = -1
+        count = kwargs.get('count') or 200
+        since_id = kwargs.get('since_id')
+        if since_id is not None:
+            since_id = int(since_id)
+        max_id = kwargs.get('max_id')
         if max_id is not None:
-            if self._statuses[-1] > max_id:
+            max_id = int(max_id)
+        _start = 0
+        _end = len(self._statuses)
+        if max_id is not None:
+            if self._statuses[-1][0] > max_id:
                 return []
             for i, status in enumerate(self._statuses):
                 if status[0] <= max_id:
                     _start = i
                     break
         if since_id is not None:
-            if self._statuses[0] <= since_id:
+            if self._statuses[0][0] <= since_id:
                 return []
             if max_id is not None:
                 if since_id > max_id:
@@ -229,9 +237,12 @@ class TestAPI(object):
                     break
         statuses = [
             self.Status(id=s[0], media=s[1])
-            for s in self._statuses[_start, _end]
+            for s in self._statuses[_start:_end + 1]
         ]
-        return statuses
+        return statuses[:count]
+
+    def VerifyCredentials(self):
+        return self.Credentials(screen_name='test')
 
 
 def test_data(filename):
