@@ -21,23 +21,24 @@ class TestPhotos(TestCase):
         remove_since_id(TEST_USER)
 
     def test_credentials(self):
-        twphotos = TwitterPhotos()
+        twphotos = TwitterPhotos(test=True)
         twphotos.verify_credentials()
 
     def test_download(self):
-        twphotos = TwitterPhotos(user=TEST_USER, outdir=self.directory)
+        twphotos = TwitterPhotos(user=TEST_USER, outdir=self.directory,
+                                 test=True)
         p = twphotos.get(count=20)
         twphotos.download()
         self.assertEqual(len(p), len(os.listdir(self.directory)))
 
     def test_increment_download(self):
         t1 = TwitterPhotos(user=TEST_USER, outdir=self.directory,
-                           num=20, increment=True)
+                           num=20, increment=True, test=True)
         photos1 = t1.get()[TEST_USER]
         self.assertEqual(len(photos1), 20)
         t1.download()
         t2 = TwitterPhotos(user=TEST_USER, outdir=self.directory,
-                           num=20, increment=True)
+                           num=20, increment=True, test=True)
         photos2 = t2.get()[TEST_USER]
         self.assertEqual(len(photos2), 0)
         t2.download()
