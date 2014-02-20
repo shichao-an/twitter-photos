@@ -14,7 +14,7 @@ python-twitter
 
 # Test scripts
 test.sh
+test-output
 
 # Coverage
 .coverage
-
