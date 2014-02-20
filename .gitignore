@@ -6,9 +6,6 @@ dist
 *.egg-info
 run.py
 
-# Test credential file
-.twphotos
-
 # Third-party packages
 python-twitter
 

@@ -1,0 +1,8 @@
+[credentials]
+consumer_key = mock_consumer_key
+consumer_secret = mock_consumer_secret
+access_token_key = mock_access_token_key
+access_token_secret = mock_access_token_secret
+
+[increments]
+
