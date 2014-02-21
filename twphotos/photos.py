@@ -50,6 +50,7 @@ class TwitterPhotos(object):
                                    access_token_secret=ACCESS_TOKEN_SECRET)
         else:
             self.api = TestAPI()
+        self.auth_user = None
         self.photos = {}
         self.max_ids = {}
         self.since_ids = {}
@@ -202,6 +203,7 @@ class TestAPI(object):
     Credentials = collections.namedtuple('Credentials', ['screen_name'])
 
     def __init__(self, *args, **kwargs):
+        self._statuses = None
         self._loads()
 
     def _loads(self):
