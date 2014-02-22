@@ -30,7 +30,7 @@ Or, you can download a source distribution and install with these commands::
 How It Works
 ------------
 
-The command-line front-end of Twitter Photos, twphotos, downloads photos from specified Twitter accounts into individual directories each named after username. It hits the Twitter API as little as possible to retrieve photos links and download each link separately. You can view the links yourself and pipe them to other programs such as ``wget``. You can specifiy photo size, number of photos to get, and whether to download new photos since last downloads. 
+The command-line front-end of Twitter Photos, "twphotos", downloads photos from specified Twitter accounts into individual directories each named after username. It hits the Twitter API as little as possible to retrieve photos links and download each link separately. You can view the links yourself and pipe them to other programs such as ``wget``. You can specifiy photo size, number of photos to get, and whether to download only new photos since last downloads. 
 
 
 Setup
