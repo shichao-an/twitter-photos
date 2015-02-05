@@ -36,7 +36,7 @@ The command-line front-end of Twitter Photos, "twphotos", downloads photos from 
 Setup
 -----
 
-Create a config file at ~/.twphotos specifying your Twitter credentials (you can create an app and get your keys at `Twitter Application Management <git@github.com:shichao-an/twitter-photos.git>`_)::
+Create a config file at ~/.twphotos specifying your Twitter credentials (you can create an app and get your keys at `Twitter Application Management <https://apps.twitter.com/>`_)::
 
     [credentials]
     consumer_key = your_consumer_key
