@@ -44,6 +44,7 @@ Create a config file at ~/.twphotos specifying your Twitter credentials (you can
     access_token_key = your_access_token_key
     access_token_secret = your_access_token_secret
 
+Note that the values on the right side of ``=`` should not contain the quotes; they are just themselves since this file is in INI format.
 
 Usage
 -----
