@@ -1,7 +1,7 @@
 Twitter Photos
 ==============
 
-.. image:: https://pypip.in/v/twitter-photos/badge.png
+.. image:: https://img.shields.io/pypi/v/twitter-photos.png
         :target: https://pypi.python.org/pypi/twitter-photos
 
 .. image:: https://travis-ci.org/shichao-an/twitter-photos.png?branch=master
