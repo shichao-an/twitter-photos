@@ -90,7 +90,7 @@ You can retrieve URLs only with ``cut`` command::
 
 Command-line Options
 ~~~~~~~~~~~~~~~~~~~~
-The "soundmeter" command accepts the following options:
+The "twphotos" command accepts the following options:
 
   -u USER, --user USER  user account
   -l LIST_SLUG, --list LIST_SLUG
