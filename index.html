@@ -40,7 +40,7 @@
 <p>Twitter Photos is a command-line tool to get photos from Twitter
 accounts.</p>
 
-<p>![demo][twphotos.gif]</p>
+<p><img src="twphotos.gif" alt="demo"></p>
 
 <h2>
 <a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
@@ -159,6 +159,20 @@ switch:</p>
 <a id="command-line-options" class="anchor" href="#command-line-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Command-line Options</h3>
 
 <p>The “twphotos” command accepts the following options:</p>
+
+<pre><code>  -u USER, --user USER  user account
+  -l LIST_SLUG, --list LIST_SLUG
+                        list slug with --user as list owner
+  -o OUTDIR, --outdir OUTDIR
+                        output directory
+  -p, --print           print media urls and tweet ids instead of download
+  -r, --parallel        enable parallel download
+  -n NUM, --num NUM     number of most recent photos to download
+  -i, --increment       download only new photos since last download
+  -e, --exclude_replies
+                        exclude replies
+  -s SIZE, --size SIZE  photo size (``large``, ``medium``, ``small`` and ``thumb``)
+</code></pre>
         </section>
 
         <footer>
