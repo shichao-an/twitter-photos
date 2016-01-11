@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Twitter-photos by shichao-an</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Twitter-photos</h1>
+          <h2>Simple, fast command-line tool to get photos from Twitter accounts</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/shichao-an/twitter-photos/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/shichao-an/twitter-photos/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/shichao-an/twitter-photos" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="twitter-photos" class="anchor" href="#twitter-photos" aria-hidden="true"><span class="octicon octicon-link"></span></a>Twitter Photos</h1>
+
+<p>[<img src="https://img.shields.io/pypi/v/twitter-photos.png" alt="image">]</p>
+
+<p>[<img src="https://travis-ci.org/shichao-an/twitter-photos.png?branch=master" alt="image">]</p>
+
+<p>Twitter Photos is a command-line tool to get photos from Twitter
+accounts.</p>
+
+<p><img src="twphotos.gif" alt="image"></p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>  python-twitter</li>
+<li>  requests</li>
+<li>  urllib3</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>You can install the package with pip:</p>
+
+<pre><code>$ pip install twitter-photos
+</code></pre>
+
+<p>Or, you can download a source distribution and install with these
+commands:</p>
+
+<pre><code>$ python setup.py install
+</code></pre>
+
+<h2>
+<a id="how-it-works" class="anchor" href="#how-it-works" aria-hidden="true"><span class="octicon octicon-link"></span></a>How It Works</h2>
+
+<p>The command-line front-end of Twitter Photos, “twphotos”, downloads
+photos from specified Twitter accounts into individual directories each
+named after username. It hits the Twitter API as little as possible to
+retrieve photos links and download each link separately. You can view
+the links yourself and pipe them to other programs such as <code>wget</code>. You
+can specifiy photo size, number of photos to get, and whether to
+download only new photos since last downloads.</p>
+
+<h2>
+<a id="setup" class="anchor" href="#setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup</h2>
+
+<p>Create a config file at ~/.twphotos specifying your Twitter credentials
+(you can create an app and get your keys at <a href="https://apps.twitter.com/">Twitter Application
+Management</a>):</p>
+
+<pre><code>[credentials]
+consumer_key = your_consumer_key
+consumer_secret = your_consumer_secret
+access_token_key = your_access_token_key
+access_token_secret = your_access_token_secret
+</code></pre>
+
+<p>Note that the values on the right side of <code>=</code> should not contain the
+quotes; they are just themselves since this file is in INI format.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>The simplest usage is to run “twphotos” from command-line without any
+options. This will download all photos from the current authenticated
+user (you):</p>
+
+<pre><code>$ twphotos
+</code></pre>
+
+<p>Download all photos from an existing user other than yourself with <code>-u</code>
+option followed by username. “twphotos” will automatically create a
+directory with the specified username and put downloaded photos in
+there:</p>
+
+<pre><code>$ twphotos -u wired
+</code></pre>
+
+<p>Download <em>n</em> most recent photos from a user using <code>-n</code> followed by
+number:</p>
+
+<pre><code>$ twphotos -u wired -n 20
+</code></pre>
+
+<p>Download photos to a directory other than the current one:</p>
+
+<pre><code>$ twphotos -u wired -o /path/to/dir
+</code></pre>
+
+<p>Enable “incremental download” to download new photos since the last
+downloads with <code>-i</code>:</p>
+
+<pre><code>$ twphotos -u wired -i
+</code></pre>
+
+<p>Enable “parallel download” to speedup the downloads using the <code>-r</code>
+switch:</p>
+
+<pre><code>$ twphotos -u wired -r
+</code></pre>
+
+<p>Print username, tweet ids, and URLs instead of downloading them with
+<code>-p</code> switch:</p>
+
+<pre><code>$ twphotos -u wired -p
+</code></pre>
+
+<p>Exclude replies tweets using <code>-e</code> switch:</p>
+
+<pre><code>$ twphotos -u wired -e
+</code></pre>
+
+<p>Download small-sized photos :</p>
+
+<pre><code>$ twphotos -u wired -s small
+</code></pre>
+
+<p>You can retrieve URLs only with <code>cut</code> command:</p>
+
+<pre><code>$ twphotos -u wired -p | cut -d ' ' -f3
+</code></pre>
+
+<h3>
+<a id="command-line-options" class="anchor" href="#command-line-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Command-line Options</h3>
+
+<p>The “twphotos” command accepts the following options:</p>
+
+<p>[<img src="https://img.shields.io/pypi/v/twitter-photos.png" alt="image">]: <a href="https://pypi.python.org/pypi/twitter-photos">https://pypi.python.org/pypi/twitter-photos</a></p>
+
+<p>[<img src="https://travis-ci.org/shichao-an/twitter-photos.png?branch=master" alt="image">]: <a href="https://travis-ci.org/shichao-an/twitter-photos">https://travis-ci.org/shichao-an/twitter-photos</a></p>
+        </section>
+
+        <footer>
+          Twitter-photos is maintained by <a href="https://github.com/shichao-an">shichao-an</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
