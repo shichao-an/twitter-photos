@@ -1,0 +1,3 @@
+python-twitter
+requests
+urllib3
