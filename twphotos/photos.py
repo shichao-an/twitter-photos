@@ -10,7 +10,7 @@ from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
                        ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES,
                        PROGRESS_FORMATTER, TEST_DATA)
 from .utils import download, create_directory
-from .command import parse_args
+from .cli import parse_args
 from .parallel import parallel_download
 from .increment import read_since_ids, set_max_ids
 import twitter
