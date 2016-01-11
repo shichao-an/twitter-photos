@@ -96,11 +96,12 @@ class TwitterPhotos(object):
             max_id = statuses[0].id
             self.max_ids.setdefault(user, max_id)
 
-        fetched_photos = [
-            (s.media[0]['id'],
-             s.media[0]['media_url']) for s in statuses
-            if s.media and s.media[0]['type'] == 'photo'
-        ]
+        fetched_photos = []
+        for s in statuses:
+            for m in s.media:
+                if m['type'] == 'photo':
+                    t = (m['id'], m['media_url'])
+                    fetched_photos.append(t)
 
         if num is not None:
             if len(photos + fetched_photos) >= num:
