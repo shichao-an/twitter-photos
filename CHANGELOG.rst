@@ -1,3 +1,8 @@
+v0.2.0
+======
+
+- Supported multiple photos in a single status
+
 v0.1.1
 ======
 
