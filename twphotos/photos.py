@@ -8,7 +8,7 @@ import sys
 # Import .settings before twitter due to local development of python-twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
                        ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES,
-                       PROGRESS_FORMATTER, TEST_DATA)
+                       PROGRESS_FORMATTER, TIMELINE_TYPES, TEST_DATA)
 from .utils import download, create_directory
 from .cli import parse_args
 from .parallel import parallel_download
@@ -19,7 +19,7 @@ import twitter
 class TwitterPhotos(object):
     def __init__(self, user=None, list_slug=None, outdir=None,
                  num=None, parallel=False, increment=False, size=None,
-                 exclude_replies=False, test=False):
+                 exclude_replies=False, tl_type=None, test=False):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
@@ -32,6 +32,7 @@ class TwitterPhotos(object):
             photos since last download
         :param: Photo size represented as a string (one of `MEDIA_SIZES`)
         :param: A boolean indicating whether to exlude replies tweets
+        :param type: Timeline type represented as a string (one of `TIMELINE_TYPES`)
         :param test: A boolean indicating whether in test mode
         """
         self.user = user
@@ -42,6 +43,7 @@ class TwitterPhotos(object):
         self.increment = increment
         self.size = size
         self.exclude_replies = exclude_replies
+        self.tl_type = tl_type
         self.test = test
         if not self.test:
             self.api = twitter.Api(consumer_key=CONSUMER_KEY,
@@ -85,12 +87,21 @@ class TwitterPhotos(object):
              since_id=None, num=None, photos=None):
         if photos is None:
             photos = []
-        statuses = self.api.GetUserTimeline(
-            screen_name=user,
-            count=count or COUNT_PER_GET,
-            max_id=max_id,
-            since_id=since_id,
-            exclude_replies=self.exclude_replies)
+
+        if self.tl_type == 'favorites':
+            statuses = self.api.GetFavorites(
+                screen_name=user,
+                count=count or COUNT_PER_GET,
+                max_id=max_id,
+                since_id=since_id)
+        else:
+            statuses = self.api.GetUserTimeline(
+                screen_name=user,
+                count=count or COUNT_PER_GET,
+                max_id=max_id,
+                since_id=since_id,
+                exclude_replies=self.exclude_replies)
+
         if statuses:
             min_id = statuses[-1].id
             max_id = statuses[0].id
@@ -98,10 +109,12 @@ class TwitterPhotos(object):
 
         fetched_photos = []
         for s in statuses:
-            for m in s.media:
-                if m['type'] == 'photo':
-                    t = (m['id'], m['media_url'])
-                    fetched_photos.append(t)
+            if s.media is not None:
+                for m in s.media:
+                    m_dict = m.AsDict()
+                    if m_dict['type'] == 'photo':
+                        t = (m_dict['id'], m_dict['media_url'])
+                        fetched_photos.append(t)
 
         if num is not None:
             if len(photos + fetched_photos) >= num:
@@ -239,7 +252,10 @@ class TestAPI(object):
                     _end = i - 1
                     break
         statuses = [
-            self.Status(id=s[0], media=s[1])
+            self.Status(id=s[0], media=[
+                    type(str('Media'),(object,),{'AsDict': (lambda self: m) })()
+                    for m in s[1]
+                ])
             for s in self._statuses[_start:_end + 1]
         ]
         return statuses[:count]
@@ -265,7 +281,8 @@ def main():
                              parallel=args.parallel,
                              increment=args.increment,
                              size=args.size,
-                             exclude_replies=args.exclude_replies)
+                             exclude_replies=args.exclude_replies,
+                             tl_type=args.type)
     # Print only scree_name, tweet id and media_url
     if args.print:
         twphotos.get(silent=True)
