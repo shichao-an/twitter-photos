@@ -252,7 +252,10 @@ class TestAPI(object):
                     _end = i - 1
                     break
         statuses = [
-            self.Status(id=s[0], media=s[1])
+            self.Status(id=s[0], media=[
+                    type(str('Media'),(object,),{'AsDict': (lambda self: m) })()
+                    for m in s[1]
+                ])
             for s in self._statuses[_start:_end + 1]
         ]
         return statuses[:count]
