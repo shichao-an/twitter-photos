@@ -1,5 +1,5 @@
 import argparse
-from .settings import MEDIA_SIZES
+from .settings import (MEDIA_SIZES, TIMELINE_TYPES)
 
 
 def parse_args():
@@ -25,5 +25,7 @@ def parse_args():
                         help='exclude replies')
     parser.add_argument('-s', '--size', choices=MEDIA_SIZES,
                         help='photo size')
+    parser.add_argument('-t', '--type', choices=TIMELINE_TYPES,
+                        help='timeline type')
     args = parser.parse_args()
     return args
