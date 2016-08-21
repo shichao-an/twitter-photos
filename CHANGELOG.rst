@@ -1,3 +1,9 @@
+v0.3.0
+======
+
+- Supported timeline types.
+- Fixed Media object error due.
+
 v0.2.0
 ======
 
