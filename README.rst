@@ -9,9 +9,8 @@ Twitter Photos
 
 Twitter Photos is a command-line tool to get photos from Twitter accounts.
 
-.. raw:: html
-
-    <a href="https://asciinema.org/a/93714" target="_blank"><img src="https://asciinema.org/a/93714.png" /></a>
+.. image:: https://asciinema.org/a/93714.png
+   :target: https://asciinema.org/a/93714
 
 Requirements
 ------------
