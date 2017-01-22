@@ -1,0 +1,8 @@
+title: Twitter Photos
+description: Simple, fast command-line tool to get photos from Twitter accounts
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-modernist
+
+gems:
+  - jekyll-mentions
