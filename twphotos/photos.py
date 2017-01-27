@@ -5,6 +5,7 @@ import collections
 import json
 import os
 import sys
+import datetime
 # Import .settings before twitter due to local development of python-twitter
 from .settings import (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN,
                        ACCESS_TOKEN_SECRET, COUNT_PER_GET, MEDIA_SIZES,
@@ -19,7 +20,7 @@ import twitter
 class TwitterPhotos(object):
     def __init__(self, user=None, list_slug=None, outdir=None,
                  num=None, parallel=False, increment=False, size=None,
-                 exclude_replies=False, tl_type=None, test=False):
+                 exclude_replies=False, tl_type=None, test=False, video = False, file_naming = False):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
@@ -34,6 +35,8 @@ class TwitterPhotos(object):
         :param: A boolean indicating whether to exlude replies tweets
         :param type: Timeline type represented as a string (one of `TIMELINE_TYPES`)
         :param test: A boolean indicating whether in test mode
+        :param video: A boolean indicated whether to include video and animated gifs
+        :param file_naming: A boolean indicating where to use tweet time and handle to name the downloads
         """
         self.user = user
         self.list_slug = list_slug
@@ -45,6 +48,9 @@ class TwitterPhotos(object):
         self.exclude_replies = exclude_replies
         self.tl_type = tl_type
         self.test = test
+        self.video = video
+        self.file_naming = file_naming
+
         if not self.test:
             self.api = twitter.Api(consumer_key=CONSUMER_KEY,
                                    consumer_secret=CONSUMER_SECRET,
@@ -58,6 +64,7 @@ class TwitterPhotos(object):
         self.since_ids = {}
         self._downloaded = 0
         self._total = 0
+        self.download_names = []
 
     def get(self, count=None, since_id=None, silent=False):
         """
@@ -110,11 +117,21 @@ class TwitterPhotos(object):
         fetched_photos = []
         for s in statuses:
             if s.media is not None:
+                m_num =0
                 for m in s.media:
                     m_dict = m.AsDict()
-                    if m_dict['type'] == 'photo':
+                    post_time = datetime.datetime.strptime(s.created_at, "%a %b %d %H:%M:%S +0000 %Y").strftime("%y%m%d_%H%M%S")
+                    m_name = (post_time + "_" + s.user.screen_name + "_" + str(m_num))
+
+                    if self.video and (m_dict['type'] == ('animated_gif' or 'video')):
+                        t = (m_dict['id'], m.video_info['variants'][0]['url'])
+                        fetched_photos.append(t)
+                        self.download_names.append(m_name)
+                    elif m_dict['type'] == 'photo':
                         t = (m_dict['id'], m_dict['media_url'])
                         fetched_photos.append(t)
+                        self.download_names.append(m_name)
+                    m_num += 1
 
         if num is not None:
             if len(photos + fetched_photos) >= num:
@@ -189,7 +206,7 @@ class TwitterPhotos(object):
             for photo in photos:
                 media_url = photo[1]
                 self._print_progress(user, media_url)
-                download(media_url, size, outdir)
+                download(media_url, size, outdir, self.download_names[self._downloaded], self.file_naming)
                 self._downloaded += 1
 
     def _get_progress(self, user, media_url):
@@ -282,7 +299,9 @@ def main():
                              increment=args.increment,
                              size=args.size,
                              exclude_replies=args.exclude_replies,
-                             tl_type=args.type)
+                             tl_type=args.type,
+                             video=args.video,
+                             file_naming=args.filenaming)
     # Print only scree_name, tweet id and media_url
     if args.print:
         twphotos.get(silent=True)

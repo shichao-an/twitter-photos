@@ -27,5 +27,9 @@ def parse_args():
                         help='photo size')
     parser.add_argument('-t', '--type', choices=TIMELINE_TYPES,
                         help='timeline type')
+    parser.add_argument('-v', '--video', action='store_true',
+                        help='enable gif and video download')
+    parser.add_argument('-f', '--filenaming', action='store_true',
+                        help='use tweet time and handle for file naming')
     args = parser.parse_args()
     return args
