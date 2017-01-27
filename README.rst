@@ -18,6 +18,7 @@ Requirements
 * python-twitter
 * requests
 * urllib3
+* datetime
 
 Installation
 ------------
@@ -108,3 +109,5 @@ The "twphotos" command accepts the following options:
                         exclude replies
   -s SIZE, --size SIZE  photo size (``large``, ``medium``, ``small`` and ``thumb``)
   -t TYPE, --type TYPE  timeline type (``user`` and ``favorites``)
+  -v, --video           enable downloading of videos and gifs (note that twitter converts gifs to mp4 video)
+  -f, --filenaming      enable file download naming to DATE_TIME_HANDLE_MEDIA-NUMBER.filetype
