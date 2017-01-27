@@ -120,18 +120,18 @@ class TwitterPhotos(object):
                 m_num =0
                 for m in s.media:
                     m_dict = m.AsDict()
-                    if s.created_at is not None:
+                    if hasattr(s, 'created_at'):
                         post_time = datetime.datetime.strptime(s.created_at, "%a %b %d %H:%M:%S +0000 %Y").strftime("%y%m%d_%H%M%S")
                         m_name = (post_time + "_" + s.user.screen_name + "_" + str(m_num))
 
-                    if self.video and (m_dict['type'] == ('animated_gif' or 'video')):
-                        t = (m_dict['id'], m.video_info['variants'][0]['url'])
-                        fetched_photos.append(t)
-                        self.download_names.append(m_name)
-                    elif m_dict['type'] == 'photo':
-                        t = (m_dict['id'], m_dict['media_url'])
-                        fetched_photos.append(t)
-                        self.download_names.append(m_name)
+                        if self.video and (m_dict['type'] == ('animated_gif' or 'video')):
+                            t = (m_dict['id'], m.video_info['variants'][0]['url'])
+                            fetched_photos.append(t)
+                            self.download_names.append(m_name)
+                        elif m_dict['type'] == 'photo':
+                            t = (m_dict['id'], m_dict['media_url'])
+                            fetched_photos.append(t)
+                            self.download_names.append(m_name)
                     m_num += 1
 
         if num is not None:
