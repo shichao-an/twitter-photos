@@ -120,8 +120,9 @@ class TwitterPhotos(object):
                 m_num =0
                 for m in s.media:
                     m_dict = m.AsDict()
-                    post_time = datetime.datetime.strptime(s.created_at, "%a %b %d %H:%M:%S +0000 %Y").strftime("%y%m%d_%H%M%S")
-                    m_name = (post_time + "_" + s.user.screen_name + "_" + str(m_num))
+                    if s.created_at is not None:
+                        post_time = datetime.datetime.strptime(s.created_at, "%a %b %d %H:%M:%S +0000 %Y").strftime("%y%m%d_%H%M%S")
+                        m_name = (post_time + "_" + s.user.screen_name + "_" + str(m_num))
 
                     if self.video and (m_dict['type'] == ('animated_gif' or 'video')):
                         t = (m_dict['id'], m.video_info['variants'][0]['url'])
