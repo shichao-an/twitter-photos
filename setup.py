@@ -12,7 +12,7 @@ setup(
     author_email='shichao.an@nyu.edu',
     url='https://github.com/shichao-an/twitter-photos',
     license='BSD',
-    install_requires=['python-twitter', 'requests', 'urllib3'],
+    install_requires=['python-twitter', 'requests', 'urllib3', 'datetime'],
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
