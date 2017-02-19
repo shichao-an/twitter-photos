@@ -132,7 +132,7 @@ class TwitterPhotos(object):
 
     def download(self, size=None):
         if size is None:
-            size = self.size or 'large'
+            size = self.size or 'orig'
         if size not in MEDIA_SIZES:
             raise Exception('Invalid media size %s' % size)
         for user in self.photos:
@@ -283,7 +283,7 @@ def main():
                              size=args.size,
                              exclude_replies=args.exclude_replies,
                              tl_type=args.type)
-    # Print only scree_name, tweet id and media_url
+    # Print only screen_name, tweet id and media_url
     if args.print:
         twphotos.get(silent=True)
         twphotos.print_urls()
