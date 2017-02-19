@@ -106,5 +106,5 @@ The "twphotos" command accepts the following options:
   -i, --increment       download only new photos since last download
   -e, --exclude_replies
                         exclude replies
-  -s SIZE, --size SIZE  photo size (``large``, ``medium``, ``small`` and ``thumb``)
+  -s SIZE, --size SIZE  photo size (``orig``, ``large``, ``medium``, ``small`` and ``thumb``)
   -t TYPE, --type TYPE  timeline type (``user`` and ``favorites``)

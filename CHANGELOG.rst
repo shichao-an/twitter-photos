@@ -1,3 +1,8 @@
+v0.3.1
+======
+
+- Support downloading original size of images.
+
 v0.3.0
 ======
 
