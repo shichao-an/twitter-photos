@@ -1,6 +1,10 @@
-import ConfigParser
 import os
 import sys
+is_py2 = sys.version[0] == '2'
+if is_py2:
+    import ConfigParser as configparser
+else:
+    import configparser as configparser
 
 
 USER_DIR = os.path.join(os.path.expanduser('~'))
@@ -17,7 +21,7 @@ SECTIONS = {
 # For local development
 sys.path.insert(1, os.path.join(PROJECT_PATH, 'python-twitter'))
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 
 if os.environ.get('TWPHOTOS_TEST_CONFIG'):
     CONFIG = TEST_CONFIG
