@@ -1,8 +1,13 @@
-import ConfigParser
+import sys
+is_py2 = sys.version[0] == '2'
+if is_py2:
+    import ConfigParser as configparser
+else:
+    import configparser as configparser
 from .settings import SECTIONS, CONFIG
 
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.read(CONFIG)
 
 if not config.has_section(SECTIONS['INCREMENTS']):
