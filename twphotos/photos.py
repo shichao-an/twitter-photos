@@ -14,7 +14,8 @@ from .cli import parse_args
 from .parallel import parallel_download
 from .increment import read_since_ids, set_max_ids
 import twitter
-
+from twitter import TwitterError
+from tqdm import tqdm
 
 class TwitterPhotos(object):
     def __init__(self, user=None, list_slug=None, outdir=None,
@@ -63,6 +64,7 @@ class TwitterPhotos(object):
         self.since_ids = {}
         self._downloaded = 0
         self._total = 0
+        self._progress = {}
 
     def get(self, count=None, since_id=None, silent=False):
         """
@@ -93,20 +95,25 @@ class TwitterPhotos(object):
         if photos is None:
             photos = []
 
-        if self.tl_type == 'favorites':
-            statuses = self.api.GetFavorites(
-                screen_name=user,
-                count=count or COUNT_PER_GET,
-                max_id=max_id,
-                since_id=since_id)
-        else:
-            statuses = self.api.GetUserTimeline(
-                screen_name=user,
-                count=count or COUNT_PER_GET,
-                max_id=max_id,
-                since_id=since_id,
-                exclude_replies=self.exclude_replies,
-                include_rts=self.include_rts)
+        try:
+            if self.tl_type == 'favorites':
+                statuses = self.api.GetFavorites(
+                    screen_name=user,
+                    count=count or COUNT_PER_GET,
+                    max_id=max_id,
+                    since_id=since_id)
+            else:
+                statuses = self.api.GetUserTimeline(
+                    screen_name=user,
+                    count=count or COUNT_PER_GET,
+                    max_id=max_id,
+                    since_id=since_id,
+                    exclude_replies=self.exclude_replies,
+                    include_rts=self.include_rts)
+        except TwitterError as err:
+            print('Could not retrieve media from %s. Error: %s' % (user, err))
+
+            sys.exit()
 
         if statuses:
             min_id = statuses[-1].id
@@ -189,20 +196,26 @@ class TwitterPhotos(object):
                 msg = 'No new photos from %s since last downloads.' % user
                 sys.stdout.write(msg)
                 return
+            elif not photos and user not in self.since_ids:
+                msg = 'No photos from %s.' % user
+                sys.stdout.write(msg)
+                return
         else:
             if not photos:
                 msg = 'No photos from %s.' % user
                 sys.stdout.write(msg)
                 return
 
+        self._progress = tqdm(photos,dynamic_ncols=True)
         if self.parallel:
-            parallel_download(photos, user, size, outdir)
+            parallel_download(photos, user, size, outdir, self._progress)
         else:
             for photo in photos:
                 media_url = photo[1]
                 self._print_progress(user, media_url)
                 download(media_url, size, outdir)
                 self._downloaded += 1
+        self._progress.close()
 
     def _get_progress(self, user, media_url):
         d = {
@@ -215,8 +228,11 @@ class TwitterPhotos(object):
         return progress
 
     def _print_progress(self, user, media_url):
-        sys.stdout.write('\r%s' % self._get_progress(user, media_url))
-        sys.stdout.flush()
+        # sys.stdout.write('\r%s' % self._get_progress(user, media_url))
+        # sys.stdout.flush()
+        media_name = os.path.basename(media_url).split('?')[0]
+        self._progress.set_description("Downloading %s from %s" % (media_name,user))
+        self._progress.update()
 
 
 class TestAPI(object):
