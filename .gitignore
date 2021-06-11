@@ -18,3 +18,11 @@ test-output
 
 # ctags
 tags
+
+# my own tests
+downloaded/
+files.txt
+debug.py
+.vscode/
+.gitignore
+.twphotos
