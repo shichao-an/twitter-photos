@@ -14,12 +14,13 @@ from .cli import parse_args
 from .parallel import parallel_download
 from .increment import read_since_ids, set_max_ids
 import twitter
-
+from twitter import TwitterError
+from tqdm import tqdm
 
 class TwitterPhotos(object):
     def __init__(self, user=None, list_slug=None, outdir=None,
                  num=None, parallel=False, increment=False, size=None,
-                 exclude_replies=False, tl_type=None, test=False):
+                 exclude_replies=False, include_rts=False, include_videos=False, tl_type=None, test=False):
         """
         :param user: The screen_name of the user whom to return results for
         :param list_slug: The slug identifying the list owned by the `user`
@@ -31,7 +32,9 @@ class TwitterPhotos(object):
         :param increment: A boolean indicating whether to download only new
             photos since last download
         :param: Photo size represented as a string (one of `MEDIA_SIZES`)
-        :param: A boolean indicating whether to exlude replies tweets
+        :param: A boolean indicating whether to exclude replies tweets
+        :param: A boolean indicating whether to include retweets
+        :param: A boolean indicating whether to download videos and animated GIFs
         :param type: Timeline type represented as a string (one of `TIMELINE_TYPES`)
         :param test: A boolean indicating whether in test mode
         """
@@ -43,13 +46,16 @@ class TwitterPhotos(object):
         self.increment = increment
         self.size = size
         self.exclude_replies = exclude_replies
+        self.include_rts = include_rts
+        self.include_videos = include_videos
         self.tl_type = tl_type
         self.test = test
         if not self.test:
             self.api = twitter.Api(consumer_key=CONSUMER_KEY,
                                    consumer_secret=CONSUMER_SECRET,
                                    access_token_key=ACCESS_TOKEN,
-                                   access_token_secret=ACCESS_TOKEN_SECRET)
+                                   access_token_secret=ACCESS_TOKEN_SECRET,
+                                   tweet_mode='extended')
         else:
             self.api = TestAPI()
         self.auth_user = None
@@ -58,6 +64,7 @@ class TwitterPhotos(object):
         self.since_ids = {}
         self._downloaded = 0
         self._total = 0
+        self._progress = {}
 
     def get(self, count=None, since_id=None, silent=False):
         """
@@ -67,7 +74,7 @@ class TwitterPhotos(object):
         :param since_id: An integer specifying the oldest tweet id
         """
         if not silent:
-            print('Retrieving photos from Twitter API...')
+            print('Retrieving media from Twitter API...')
         self.auth_user = self.verify_credentials().screen_name
         self.since_ids = read_since_ids(self.users)
         for user in self.users:
@@ -88,19 +95,25 @@ class TwitterPhotos(object):
         if photos is None:
             photos = []
 
-        if self.tl_type == 'favorites':
-            statuses = self.api.GetFavorites(
-                screen_name=user,
-                count=count or COUNT_PER_GET,
-                max_id=max_id,
-                since_id=since_id)
-        else:
-            statuses = self.api.GetUserTimeline(
-                screen_name=user,
-                count=count or COUNT_PER_GET,
-                max_id=max_id,
-                since_id=since_id,
-                exclude_replies=self.exclude_replies)
+        try:
+            if self.tl_type == 'favorites':
+                statuses = self.api.GetFavorites(
+                    screen_name=user,
+                    count=count or COUNT_PER_GET,
+                    max_id=max_id,
+                    since_id=since_id)
+            else:
+                statuses = self.api.GetUserTimeline(
+                    screen_name=user,
+                    count=count or COUNT_PER_GET,
+                    max_id=max_id,
+                    since_id=since_id,
+                    exclude_replies=self.exclude_replies,
+                    include_rts=self.include_rts)
+        except TwitterError as err:
+            print('Could not retrieve media from %s. Error: %s' % (user, err))
+
+            sys.exit()
 
         if statuses:
             min_id = statuses[-1].id
@@ -112,8 +125,14 @@ class TwitterPhotos(object):
             if s.media is not None:
                 for m in s.media:
                     m_dict = m.AsDict()
+                    if self.include_videos is True:
+                        if m_dict['type'] == 'video' or m_dict['type'] == 'animated_gif':
+                            vari = tuple((m_dict['video_info']['variants']))
+                            vd = sorted(vari, key=lambda x: int(x.get("bitrate") or 0), reverse = True)
+                            t = (m_dict['id'], vd[0]['url'], s.id_str)
+                            fetched_photos.append(t)
                     if m_dict['type'] == 'photo':
-                        t = (m_dict['id'], m_dict['media_url'])
+                        t = (m_dict['id'], m_dict['media_url_https'], s.id_str)
                         fetched_photos.append(t)
 
         if num is not None:
@@ -165,7 +184,7 @@ class TwitterPhotos(object):
         for user in self.photos:
             photos = self.photos[user]
             for i, photo in enumerate(photos):
-                line = '%s %s %s' % (user, photo[0], photo[1])
+                line = '%s %s %s %s' % (user, photo[0], photo[1], photo[2])
                 if i < len(photos) - 1:
                     print(line)
                 else:
@@ -177,24 +196,30 @@ class TwitterPhotos(object):
                 msg = 'No new photos from %s since last downloads.' % user
                 sys.stdout.write(msg)
                 return
+            elif not photos and user not in self.since_ids:
+                msg = 'No photos from %s.' % user
+                sys.stdout.write(msg)
+                return
         else:
             if not photos:
                 msg = 'No photos from %s.' % user
                 sys.stdout.write(msg)
                 return
 
+        self._progress = tqdm(photos,dynamic_ncols=True)
         if self.parallel:
-            parallel_download(photos, user, size, outdir)
+            parallel_download(photos, user, size, outdir, self._progress)
         else:
             for photo in photos:
                 media_url = photo[1]
                 self._print_progress(user, media_url)
                 download(media_url, size, outdir)
                 self._downloaded += 1
+        self._progress.close()
 
     def _get_progress(self, user, media_url):
         d = {
-            'media_url': os.path.basename(media_url),
+            'media_url': os.path.basename(media_url).split('?')[0],
             'user': user,
             'index': self._downloaded + 1,
             'total': self._total,
@@ -203,8 +228,11 @@ class TwitterPhotos(object):
         return progress
 
     def _print_progress(self, user, media_url):
-        sys.stdout.write('\r%s' % self._get_progress(user, media_url))
-        sys.stdout.flush()
+        # sys.stdout.write('\r%s' % self._get_progress(user, media_url))
+        # sys.stdout.flush()
+        media_name = os.path.basename(media_url).split('?')[0]
+        self._progress.set_description("Downloading %s from %s" % (media_name,user))
+        self._progress.update()
 
 
 class TestAPI(object):
@@ -282,6 +310,8 @@ def main():
                              increment=args.increment,
                              size=args.size,
                              exclude_replies=args.exclude_replies,
+                             include_videos=args.videos,
+                             include_rts=args.include_retweets,
                              tl_type=args.type)
     # Print only scree_name, tweet id and media_url
     if args.print:

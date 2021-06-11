@@ -3,8 +3,8 @@ import requests
 
 
 def download(media_url, size, outdir):
-    r = requests.get(media_url + ':' + size, stream=True)
-    bs = os.path.basename(media_url)
+    r = requests.get(media_url, stream=True)
+    bs = os.path.basename(media_url).split('?')[0]
     filename = os.path.join(outdir or '', bs)
     with open(filename, 'wb') as fd:
         for chunk in r.iter_content(chunk_size=1024):

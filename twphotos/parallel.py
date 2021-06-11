@@ -2,21 +2,24 @@ import os
 import threading
 import sys
 import urllib3
+import certifi
 is_py2 = sys.version[0] == '2'
 if is_py2:
     import Queue as queue
 else:
     import queue as queue
 from .settings import PROGRESS_FORMATTER, NUM_THREADS
+from queue import Empty
+from tqdm import tqdm
 
 
-pool_manager = urllib3.PoolManager()
+pool_manager = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',ca_certs=certifi.where())
 photo_queue = queue.Queue()
 lock = threading.Lock()
 downloaded = 0
+progress = []
 
-
-def parallel_download(photos, user, size, outdir):
+def parallel_download(photos, user, size, outdir, progress):
     threads = []
     # Put photos into `photo_queue`
     for photo in photos:
@@ -25,7 +28,7 @@ def parallel_download(photos, user, size, outdir):
     thread_pool = [
         threading.Thread(
             target=worker,
-            args=(photo_queue, user, size, outdir, len(photos))
+            args=(photo_queue, user, size, outdir, len(photos), progress)
         ) for i in range(NUM_THREADS)
     ]
 
@@ -37,31 +40,34 @@ def parallel_download(photos, user, size, outdir):
         t.join()
 
 
-def worker(queue, user, size, outdir, total):
+def worker(q, user, size, outdir, total, progress):
     while True:
         try:
-            photo = queue.get(False)
-        except Queue.Empty:
+            photo = q.get(False)
+        except Empty:
             break
         media_url = photo[1]
+        media_name = os.path.basename(media_url).split('?')[0]
+        progress.set_description("Downloading %s from %s" % (media_name,user))
         urllib3_download(media_url, size, outdir)
-        with lock:
-            global downloaded
-            downloaded += 1
-            d = {
-                'media_url': os.path.basename(media_url),
-                'user': user,
-                'index': downloaded + 1 if downloaded < total else total,
-                'total': total,
-            }
-            progress = PROGRESS_FORMATTER % d
-            sys.stdout.write('\r%s' % progress)
-            sys.stdout.flush()
+        progress.update()
+        # with lock:
+        #     global downloaded
+        #     downloaded += 1
+        #     d = {
+        #         'media_url': os.path.basename(media_url).split('?')[0],
+        #         'user': user,
+        #         'index': downloaded + 1 if downloaded < total else total,
+        #         'total': total,
+        #     }
+        #     progress = PROGRESS_FORMATTER % d
+        #     sys.stdout.write('\r%s' % progress)
+        #     sys.stdout.flush()
 
 
 def urllib3_download(media_url, size, outdir):
     r = pool_manager.request('GET', media_url + ':' + size)
-    bs = os.path.basename(media_url)
+    bs = os.path.basename(media_url).split('?')[0]
     filename = os.path.join(outdir or '', bs)
     with open(filename, 'wb') as fd:
         fd.write(r.data)
