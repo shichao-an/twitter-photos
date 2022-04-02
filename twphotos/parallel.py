@@ -37,11 +37,11 @@ def parallel_download(photos, user, size, outdir):
         t.join()
 
 
-def worker(queue, user, size, outdir, total):
+def worker(my_queue, user, size, outdir, total):
     while True:
         try:
-            photo = queue.get(False)
-        except Queue.Empty:
+            photo = my_queue.get(False)
+        except queue.Empty:
             break
         media_url = photo[1]
         urllib3_download(media_url, size, outdir)
