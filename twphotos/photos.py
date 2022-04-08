@@ -49,7 +49,8 @@ class TwitterPhotos(object):
             self.api = twitter.Api(consumer_key=CONSUMER_KEY,
                                    consumer_secret=CONSUMER_SECRET,
                                    access_token_key=ACCESS_TOKEN,
-                                   access_token_secret=ACCESS_TOKEN_SECRET)
+                                   access_token_secret=ACCESS_TOKEN_SECRET,
+                                   tweet_mode='extended')
         else:
             self.api = TestAPI()
         self.auth_user = None
@@ -106,14 +107,14 @@ class TwitterPhotos(object):
             min_id = statuses[-1].id
             max_id = statuses[0].id
             self.max_ids.setdefault(user, max_id)
-
         fetched_photos = []
         for s in statuses:
             if s.media is not None:
+                s_dict=s.AsDict()
                 for m in s.media:
                     m_dict = m.AsDict()
                     if m_dict['type'] == 'photo':
-                        t = (m_dict['id'], m_dict['media_url'])
+                        t = (m_dict['id'], m_dict['media_url'], s_dict['id_str'])
                         fetched_photos.append(t)
 
         if num is not None:
@@ -165,7 +166,7 @@ class TwitterPhotos(object):
         for user in self.photos:
             photos = self.photos[user]
             for i, photo in enumerate(photos):
-                line = '%s %s %s' % (user, photo[0], photo[1])
+                line = '%s %s %s %s' % (user, photo[0], photo[1], photo[2])
                 if i < len(photos) - 1:
                     print(line)
                 else:
